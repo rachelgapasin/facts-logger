@@ -2,8 +2,8 @@ import React, { useState } from "react";
 import supabase from "./supabase";
 
 function NewFactForm({ setFacts, categories, setShowForm }) {
-  const [text, setText] = useState("My boyfriend is the best.");
-  const [source, setSource] = useState("https://example.com");
+  const [text, setText] = useState("");
+  const [source, setSource] = useState("");
   const [category, setCategory] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const textLength = text.length;
@@ -21,7 +21,7 @@ function NewFactForm({ setFacts, categories, setShowForm }) {
       setIsUploading(false);
 
       if (!error) setFacts((fact) => [newFact[0], ...fact]);
-      
+
       setShowForm(false);
     }
   }
