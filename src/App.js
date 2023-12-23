@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import supabase from "./supabase";
 import "./style.css";
 import Header from "./Header";
@@ -62,7 +62,7 @@ function App() {
         {isLoading ? (
           <p className="message">Loading...</p>
         ) : (
-          <FactsList facts={facts} />
+          <FactsList facts={facts} setFacts={setFacts} />
         )}
       </main>
     </>

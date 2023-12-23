@@ -1,26 +1,27 @@
 import React, { useState } from "react";
+import supabase from "./supabase";
 
 function NewFactForm({ setFacts, categories, setShowForm }) {
   const [text, setText] = useState("My boyfriend is the best.");
   const [source, setSource] = useState("https://example.com");
   const [category, setCategory] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const textLength = text.length;
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
 
     if (text && source && category && textLength <= 200) {
-      const newFact = {
-        id: Math.round(Math.random() * 1000000),
-        text,
-        source,
-        category,
-        votesInteresting: 0,
-        votesMindblowing: 0,
-        votesFalse: 0,
-        createdIn: new Date().getFullYear(),
-      };
-      setFacts((fact) => [newFact, ...fact]);
+      // upload fact to Supabase and receive the new fact object
+      setIsUploading(true);
+      const { data: newFact, error } = await supabase
+        .from("facts")
+        .insert([{ text, source, category }])
+        .select();
+      setIsUploading(false);
+
+      if (!error) setFacts((fact) => [newFact[0], ...fact]);
+      
       setShowForm(false);
     }
   }
@@ -32,6 +33,7 @@ function NewFactForm({ setFacts, categories, setShowForm }) {
         placeholder="Share a fact with the world..."
         value={text}
         onChange={(e) => setText(e.target.value)}
+        disabled={isUploading}
       />
       <span>{200 - textLength}</span>
       <input
@@ -40,8 +42,13 @@ function NewFactForm({ setFacts, categories, setShowForm }) {
         value={source}
         onChange={(e) => setSource(e.target.value)}
         autoComplete="off"
+        disabled={isUploading}
       />
-      <select value={category} onChange={(e) => setCategory(e.target.value)}>
+      <select
+        value={category}
+        onChange={(e) => setCategory(e.target.value)}
+        disabled={isUploading}
+      >
         <option value="">Choose category:</option>
         {categories.map((category) => (
           <option key={category.name} value={category.name}>
@@ -50,7 +57,9 @@ function NewFactForm({ setFacts, categories, setShowForm }) {
           </option>
         ))}
       </select>
-      <button className="btn btn-large">Post</button>
+      <button className="btn btn-large" disabled={isUploading}>
+        Post
+      </button>
     </form>
   );
 }
